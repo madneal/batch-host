@@ -243,7 +243,6 @@ public class BurpExtender implements IBurpExtender, IProxyListener, IMessageEdit
                 }
             }
 
-            // Get body
             int bodyOffset = reqInfo.getBodyOffset();
             byte[] body = Arrays.copyOfRange(request, bodyOffset, request.length);
 
@@ -309,7 +308,9 @@ public class BurpExtender implements IBurpExtender, IProxyListener, IMessageEdit
         IRequestInfo request = mHelpers.analyzeRequest(httpReqResp.getRequest());
         String host = request.getUrl().getHost();
         List<String> variations = generateHostVariations(host);
-
+        for (String newHost: variations) {
+            IHttpRequestResponse response = modifyRequest(httpReqResp, newHost);
+        }
     }
 
     private void doScan(IHttpRequestResponse httpReqResp, String from, String payloadItem) {
