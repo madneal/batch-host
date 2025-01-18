@@ -228,9 +228,88 @@ public class BurpExtender implements IBurpExtender, IProxyListener, IMessageEdit
         doScan(httpReqResp, "Proxy");
     }
 
+    public IHttpRequestResponse modifyRequest(IHttpRequestResponse baseReqResp, String newHost) {
+        try {
+            // Get request info
+            byte[] request = baseReqResp.getRequest();
+            IRequestInfo reqInfo = mHelpers.analyzeRequest(request);
+
+            // Update headers
+            List<String> headers = new ArrayList<>(reqInfo.getHeaders());
+            for (int i = 0; i < headers.size(); i++) {
+                if (headers.get(i).toLowerCase().startsWith("host:")) {
+                    headers.set(i, "Host: " + newHost);
+                    break;
+                }
+            }
+
+            // Get body
+            int bodyOffset = reqInfo.getBodyOffset();
+            byte[] body = Arrays.copyOfRange(request, bodyOffset, request.length);
+
+            // Build new request
+            byte[] newRequest = mHelpers.buildHttpMessage(headers, body);
+
+            // Create new service
+            IHttpService oldService = baseReqResp.getHttpService();
+            IHttpService newService = mHelpers.buildHttpService(
+                    newHost,
+                    oldService.getPort(),
+                    oldService.getProtocol()
+            );
+
+            // Create new request response
+            IHttpRequestResponse newReqResp = mCallbacks.makeHttpRequest(newService, newRequest);
+            return newReqResp;
+        } catch (Exception e) {
+            mCallbacks.printError("Failed to modify request: " + e.getMessage());
+            return null;
+        }
+    }
+
+
+    private List<String> generateHostVariations(String originalHost) {
+        try {
+            List<String> variations = new ArrayList<>();
+            List<String> TARGET_SUFFIXES = Arrays.asList(
+                    "com.br",
+                    "co.id",
+                    "vn",
+                    "sg",
+                    "tw",
+                    "co.th"
+            );
+            if (originalHost == null || originalHost.isEmpty()) {
+                return variations;
+            }
+            String currentSuffix = "";
+            for (String suffix: TARGET_SUFFIXES) {
+                if (originalHost.toLowerCase().endsWith("." + suffix)) {
+                    currentSuffix = suffix;
+                    break;
+                }
+            }
+            if (currentSuffix == "") {
+                return variations;
+            }
+            String baseDomain = originalHost.substring(0, originalHost.toLowerCase().lastIndexOf("."+currentSuffix));
+            for (String newSuffix: TARGET_SUFFIXES) {
+                if (!newSuffix.equals(currentSuffix)) {
+                    String variation = baseDomain + "." + newSuffix;
+                    variations.add(variation);
+                }
+            }
+            return variations;
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
     private void doScan(IHttpRequestResponse httpReqResp, String from) {
-        String item = WordlistManager.getItem(WordlistManager.KEY_PAYLOAD);
-        doScan(httpReqResp, from, item);
+        IRequestInfo request = mHelpers.analyzeRequest(httpReqResp.getRequest());
+        String host = request.getUrl().getHost();
+        List<String> variations = generateHostVariations(host);
+
     }
 
     private void doScan(IHttpRequestResponse httpReqResp, String from, String payloadItem) {
