@@ -18,9 +18,7 @@ public interface Constants {
     String BANNER = "" +
             "##############################################\n" +
             "  " + PLUGIN_NAME + " v" + PLUGIN_VERSION + "\n" +
-            "  Author:    0ne_1\n" +
-            "  Developer: vaycore\n" +
-            "  Developer: Rural.Dog\n" +
+            "  Author:    madneal\n" +
             "  Github: https://github.com/vaycore/OneScan\n" +
             "##############################################\n";
 

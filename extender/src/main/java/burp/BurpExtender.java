@@ -160,40 +160,12 @@ public class BurpExtender implements IBurpExtender, IProxyListener, IMessageEdit
         JMenuItem sendToOneScanItem = new JMenuItem(L.get("send_to_plugin"));
         items.add(sendToOneScanItem);
         sendToOneScanItem.addActionListener((event) -> new Thread(() -> {
+            Logger.info("send clicked");
             IHttpRequestResponse[] messages = invocation.getSelectedMessages();
             for (IHttpRequestResponse httpReqResp : messages) {
                 doScan(httpReqResp, "Send");
-                // 线程池关闭后，停止发送扫描任务
-                if (mThreadPool.isShutdown()) {
-                    Logger.debug("sendToPlugin: thread pool is shutdown, stop sending scan task");
-                    return;
-                }
             }
         }).start());
-        // 选择 Payload 扫描
-        List<String> payloadList = WordlistManager.getItemList(WordlistManager.KEY_PAYLOAD);
-        if (!payloadList.isEmpty() && payloadList.size() > 1) {
-            JMenu menu = new JMenu(L.get("use_payload_scan"));
-            items.add(menu);
-            ActionListener listener = (event) -> new Thread(() -> {
-                String action = event.getActionCommand();
-                IHttpRequestResponse[] messages = invocation.getSelectedMessages();
-                for (IHttpRequestResponse httpReqResp : messages) {
-                    doScan(httpReqResp, "Send", action);
-                    // 线程池关闭后，停止发送扫描任务
-                    if (mThreadPool.isShutdown()) {
-                        Logger.debug("usePayloadScan: thread pool is shutdown, stop sending scan task");
-                        return;
-                    }
-                }
-            }).start();
-            for (String itemName : payloadList) {
-                JMenuItem item = new JMenuItem(itemName);
-                item.setActionCommand(itemName);
-                item.addActionListener(listener);
-                menu.add(item);
-            }
-        }
         return items;
     }
 
@@ -305,11 +277,20 @@ public class BurpExtender implements IBurpExtender, IProxyListener, IMessageEdit
     }
 
     private void doScan(IHttpRequestResponse httpReqResp, String from) {
+        Logger.info("scan start", httpReqResp.getHttpService().getHost());
+        if (httpReqResp == null) {
+            Logger.error("resp is null");
+            return;
+        }
         IRequestInfo request = mHelpers.analyzeRequest(httpReqResp.getRequest());
         String host = request.getUrl().getHost();
+        Logger.info(host);
         List<String> variations = generateHostVariations(host);
         for (String newHost: variations) {
+            Logger.info(newHost);
             IHttpRequestResponse response = modifyRequest(httpReqResp, newHost);
+            mCallbacks.sendToRepeater(newHost, response.getHttpService().getPort(),
+                    response.getHttpService().getProtocol().equals("https"), response.getRequest(), newHost);
         }
     }
 
