@@ -200,44 +200,28 @@ public class BurpExtender implements IBurpExtender, IProxyListener, IMessageEdit
         doScan(httpReqResp, "Proxy");
     }
 
-    public IHttpRequestResponse modifyRequest(IHttpRequestResponse baseReqResp, String newHost) {
+    private void modifyRequestAndSendToRepeater(IHttpRequestResponse res, String newHost) {
         try {
-            // Get request info
-            byte[] request = baseReqResp.getRequest();
-            IRequestInfo reqInfo = mHelpers.analyzeRequest(request);
-
-            // Update headers
-            List<String> headers = new ArrayList<>(reqInfo.getHeaders());
+            byte[] request = res.getRequest();
+            IHttpService service = res.getHttpService();
+            IRequestInfo requestInfo = mHelpers.analyzeRequest(service, request);
+            List<String> headers = new ArrayList<>(requestInfo.getHeaders());
             for (int i = 0; i < headers.size(); i++) {
                 if (headers.get(i).toLowerCase().startsWith("host:")) {
                     headers.set(i, "Host: " + newHost);
                     break;
                 }
             }
-
-            int bodyOffset = reqInfo.getBodyOffset();
-            byte[] body = Arrays.copyOfRange(request, bodyOffset, request.length);
-
-            // Build new request
-            byte[] newRequest = mHelpers.buildHttpMessage(headers, body);
-
-            // Create new service
-            IHttpService oldService = baseReqResp.getHttpService();
-            IHttpService newService = mHelpers.buildHttpService(
-                    newHost,
-                    oldService.getPort(),
-                    oldService.getProtocol()
-            );
-
-            // Create new request response
-            IHttpRequestResponse newReqResp = mCallbacks.makeHttpRequest(newService, newRequest);
-            return newReqResp;
+            byte[] body = Arrays.copyOfRange(request, requestInfo.getBodyOffset(), request.length);
+            byte[] modifiedRequest = mHelpers.buildHttpMessage(headers, body);
+            boolean isHttps = service.getProtocol().equalsIgnoreCase("https");
+            int newPort = isHttps ? 443 : 80;
+            mCallbacks.sendToRepeater(newHost, newPort,
+                    isHttps, modifiedRequest, newHost);
         } catch (Exception e) {
-            mCallbacks.printError("Failed to modify request: " + e.getMessage());
-            return null;
+            mCallbacks.printError(e.getMessage());
         }
     }
-
 
     private List<String> generateHostVariations(String originalHost) {
         try {
@@ -276,74 +260,34 @@ public class BurpExtender implements IBurpExtender, IProxyListener, IMessageEdit
         }
     }
 
-    private void doScan(IHttpRequestResponse httpReqResp, String from) {
-        Logger.info("scan start", httpReqResp.getHttpService().getHost());
-        if (httpReqResp == null) {
-            Logger.error("resp is null");
-            return;
+    private String getHost(List<String> headers) {
+        String host = "";
+        for (String header: headers) {
+            if (header.toLowerCase().startsWith("host: ")) {
+                host = header.substring(6).trim();
+            }
         }
-        IRequestInfo request = mHelpers.analyzeRequest(httpReqResp.getRequest());
-        String host = request.getUrl().getHost();
-        Logger.info(host);
-        List<String> variations = generateHostVariations(host);
-        for (String newHost: variations) {
-            Logger.info(newHost);
-            IHttpRequestResponse response = modifyRequest(httpReqResp, newHost);
-            mCallbacks.sendToRepeater(newHost, response.getHttpService().getPort(),
-                    response.getHttpService().getProtocol().equals("https"), response.getRequest(), newHost);
-        }
+        return host;
     }
 
-    private void doScan(IHttpRequestResponse httpReqResp, String from, String payloadItem) {
-        if (httpReqResp == null || httpReqResp.getHttpService() == null) {
-            return;
-        }
-        IRequestInfo info = mHelpers.analyzeRequest(httpReqResp);
-        String host = httpReqResp.getHttpService().getHost();
-        // 对来自代理的包进行检测，检测请求方法是否需要拦截
-        if (from.equals("Proxy")) {
-            String method = info.getMethod();
-            if (includeMethodFilter(method)) {
-                // 拦截不匹配的请求方法
-                Logger.debug("doScan filter request method: %s, host: %s", method, host);
+    private void doScan(IHttpRequestResponse httpReqResp, String from) {
+        try {
+            Logger.info("scan start", httpReqResp.getHttpService().getHost());
+            if (httpReqResp == null) {
+                Logger.error("resp is null");
                 return;
             }
-            // 检测 Host 是否在白名单、黑名单列表中
-            if (hostAllowlistFilter(host) || hostBlocklistFilter(host)) {
-                Logger.debug("doScan allowlist and blocklist filter host: %s", host);
-                return;
+            IRequestInfo request = mHelpers.analyzeRequest(httpReqResp.getRequest());
+            String host = getHost(request.getHeaders());
+            Logger.info(host);
+            List<String> variations = generateHostVariations(host);
+            for (String newHost: variations) {
+                modifyRequestAndSendToRepeater(httpReqResp, newHost);
             }
-            // 收集数据（只收集代理流量的数据）
-            CollectManager.collect(true, host, httpReqResp.getRequest());
-            CollectManager.collect(false, host, httpReqResp.getResponse());
+        } catch (Exception e) {
+            mCallbacks.printError("fail to doScan: " + e.getMessage());
         }
-        // 生成任务
-        URL url = getUrlByRequestInfo(info);
-        // 原始请求也需要经过 Payload Process 处理（不过需要过滤一些后缀的流量）
-        if (!proxyExcludeSuffixFilter(url)) {
-            runScanTask(httpReqResp, info, null, from);
-        } else {
-            Logger.debug("proxyExcludeSuffixFilter filter request path: %s", url.getPath());
-        }
-        // 检测是否禁用递归扫描
-        if (!mDataBoardTab.hasDirScan()) {
-            return;
-        }
-        Logger.debug("doScan receive: %s%s", getHostByUrl(url), url.getPath());
-        ArrayList<String> pathDict = getUrlPathDict(url.getPath());
-        List<String> payloads = WordlistManager.getPayload(payloadItem);
-        // 一级目录一级目录递减访问
-        for (int i = pathDict.size() - 1; i >= 0; i--) {
-            String path = pathDict.get(i);
-            // 拼接字典，发起请求
-            for (String item : payloads) {
-                if (path.endsWith("/")) {
-                    path = path.substring(0, path.length() - 1);
-                }
-                String urlPath = path + item;
-                runScanTask(httpReqResp, info, urlPath, "Scan");
-            }
-        }
+
     }
 
     /**
