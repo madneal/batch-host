@@ -1,6 +1,6 @@
 package burp.vaycore.onescan.ui.tab.config;
 
-import burp.batchhost.HaE;
+import burp.batchhost.BatchHost;
 import burp.vaycore.common.helper.UIHelper;
 import burp.vaycore.common.layout.HLayout;
 import burp.vaycore.common.utils.StringUtils;
@@ -74,7 +74,7 @@ public class OtherTab extends BaseConfigTab implements ActionListener {
         switch (action) {
             case "hae-plugin-select-file":
                 oldPath = getHaEPluginPath();
-                if (HaE.hasInstall()) {
+                if (BatchHost.hasInstall()) {
                     UIHelper.showTipsDialog(L.get("hae_plugin_already_loaded"));
                     return;
                 }
@@ -83,7 +83,7 @@ public class OtherTab extends BaseConfigTab implements ActionListener {
                     return;
                 }
                 mHaEPluginPath.setText(filepath);
-                HaE.loadPlugin(filepath, new HaE.LoadPluginCallback() {
+                BatchHost.loadPlugin(filepath, new BatchHost.LoadPluginCallback() {
                     @Override
                     public void onLoadSuccess() {
                         UIHelper.showTipsDialog(L.get("hae_load_success"));
@@ -99,12 +99,12 @@ public class OtherTab extends BaseConfigTab implements ActionListener {
                 });
                 break;
             case "hae-plugin-unload":
-                boolean state = HaE.unloadPlugin();
+                boolean state = BatchHost.unloadPlugin();
                 if (state) {
                     mHaEPluginPath.setText("");
                     Config.put(Config.KEY_HAE_PLUGIN_PATH, "");
                     UIHelper.showTipsDialog(L.get("hae_unload_success"));
-                } else if (!HaE.hasInstall()) {
+                } else if (!BatchHost.hasInstall()) {
                     UIHelper.showTipsDialog(L.get("hae_not_installed"));
                 } else {
                     UIHelper.showTipsDialog(L.get("hae_unload_failed"));

@@ -29,12 +29,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-/**
- * HaE 插件对接
- * <p>
- * Created by vaycore on 2022-09-08.
- */
-public class HaE {
+public class BatchHost {
 
     private static BurpExtender sExtender;
     private static IBurpExtenderCallbacks sCallbacks;
@@ -54,7 +49,7 @@ public class HaE {
      * @param pluginPath 插件jar包路径
      */
     public static void loadPlugin(String pluginPath) {
-        HaE.loadPlugin(pluginPath, new LoadPluginCallback() {
+        BatchHost.loadPlugin(pluginPath, new LoadPluginCallback() {
             @Override
             public void onLoadSuccess() {
 
@@ -115,7 +110,7 @@ public class HaE {
                 callback.onLoadSuccess();
             });
             // 监听主动卸载插件事件（直接调用 HaE.unloadPlugin 方法即可）
-            sAdapter.setOnUnloadExtensionListener(HaE::unloadPlugin);
+            sAdapter.setOnUnloadExtensionListener(BatchHost::unloadPlugin);
             // 初始化 HaE 插件
             initHaE(pluginPath);
         } catch (Exception e) {

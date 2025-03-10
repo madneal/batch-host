@@ -1,6 +1,6 @@
 package burp;
 
-import burp.batchhost.HaE;
+import burp.batchhost.BatchHost;
 import burp.vaycore.common.helper.DomainHelper;
 import burp.vaycore.common.helper.QpsLimiter;
 import burp.vaycore.common.helper.UIHelper;
@@ -80,7 +80,7 @@ public class BurpExtender implements IBurpExtender, IProxyListener, IMessageEdit
         initEvent();
         Logger.debug("register Extender ok! Log: %b", Constants.DEBUG);
         // 加载HaE插件
-        HaE.loadPlugin(Config.getFilePath(Config.KEY_HAE_PLUGIN_PATH));
+        BatchHost.loadPlugin(Config.getFilePath(Config.KEY_HAE_PLUGIN_PATH));
     }
 
     private void initData(IBurpExtenderCallbacks callbacks) {
@@ -97,7 +97,7 @@ public class BurpExtender implements IBurpExtender, IProxyListener, IMessageEdit
         // 初始化域名辅助类
         DomainHelper.init("public_suffix_list.json");
         // 初始化HaE插件
-        HaE.init(this);
+        BatchHost.init(this);
         // 初始化QPS限制器
         initQpsLimiter();
         // 注册 OneScan 信息辅助面板
@@ -571,7 +571,7 @@ public class BurpExtender implements IBurpExtender, IProxyListener, IMessageEdit
                 int retryCount = getReqRetryCount();
                 IHttpRequestResponse newReqResp = doMakeHttpRequest(service, url, reqRawBytes, retryCount);
                 // HaE提取信息
-                HaE.processHttpMessage(newReqResp);
+                BatchHost.processHttpMessage(newReqResp);
                 // 构建展示的数据包
                 TaskData data = buildTaskData(newReqResp);
                 // 用于过滤代理数据包
@@ -1349,7 +1349,7 @@ public class BurpExtender implements IBurpExtender, IProxyListener, IMessageEdit
     @Override
     public void extensionUnloaded() {
         // 卸载 HaE 插件
-        HaE.unloadPlugin();
+        BatchHost.unloadPlugin();
         // 移除代理监听器
         mCallbacks.removeProxyListener(this);
         // 移除插件卸载监听器

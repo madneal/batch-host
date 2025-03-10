@@ -10,10 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * <p>
- * Created by vaycore on 2022-09-08.
- */
 public class BurpCallbacksAdapter implements IBurpExtenderCallbacks {
 
     private final IBurpExtenderCallbacks callbacks;
