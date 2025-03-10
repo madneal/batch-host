@@ -1,4 +1,4 @@
-package burp.hae.montoya.utilities;
+package burp.batchhost.montoya.utilities;
 
 import burp.IBurpExtenderCallbacks;
 import burp.IExtensionHelpers;

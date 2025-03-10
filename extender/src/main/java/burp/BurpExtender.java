@@ -1,6 +1,6 @@
 package burp;
 
-import burp.hae.HaE;
+import burp.batchhost.HaE;
 import burp.vaycore.common.helper.DomainHelper;
 import burp.vaycore.common.helper.QpsLimiter;
 import burp.vaycore.common.helper.UIHelper;
@@ -24,7 +24,6 @@ import burp.vaycore.onescan.ui.widget.payloadlist.ProcessingItem;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.URL;

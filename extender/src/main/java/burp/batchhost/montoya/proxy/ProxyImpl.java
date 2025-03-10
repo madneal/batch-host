@@ -1,4 +1,4 @@
-package burp.hae.montoya.proxy;
+package burp.batchhost.montoya.proxy;
 
 import burp.IBurpExtenderCallbacks;
 import burp.api.montoya.core.Registration;

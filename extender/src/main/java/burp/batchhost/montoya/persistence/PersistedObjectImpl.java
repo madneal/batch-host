@@ -1,4 +1,4 @@
-package burp.hae.montoya.persistence;
+package burp.batchhost.montoya.persistence;
 
 import burp.api.montoya.core.ByteArray;
 import burp.api.montoya.http.message.HttpRequestResponse;

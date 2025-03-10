@@ -1,4 +1,4 @@
-package burp.hae.montoya;
+package burp.batchhost.montoya;
 
 import burp.IBurpExtenderCallbacks;
 import burp.api.montoya.MontoyaApi;
@@ -20,14 +20,14 @@ import burp.api.montoya.sitemap.SiteMap;
 import burp.api.montoya.ui.UserInterface;
 import burp.api.montoya.utilities.Utilities;
 import burp.api.montoya.websocket.WebSockets;
-import burp.hae.montoya.extension.ExtensionImpl;
-import burp.hae.montoya.http.HttpImpl;
-import burp.hae.montoya.logging.LoggingImpl;
-import burp.hae.montoya.persistence.PersistenceImpl;
-import burp.hae.montoya.proxy.ProxyImpl;
-import burp.hae.montoya.scanner.ScannerImpl;
-import burp.hae.montoya.ui.UserInterfaceImpl;
-import burp.hae.montoya.utilities.UtilitiesImpl;
+import burp.batchhost.montoya.extension.ExtensionImpl;
+import burp.batchhost.montoya.http.HttpImpl;
+import burp.batchhost.montoya.logging.LoggingImpl;
+import burp.batchhost.montoya.persistence.PersistenceImpl;
+import burp.batchhost.montoya.proxy.ProxyImpl;
+import burp.batchhost.montoya.scanner.ScannerImpl;
+import burp.batchhost.montoya.ui.UserInterfaceImpl;
+import burp.batchhost.montoya.utilities.UtilitiesImpl;
 
 /**
  * MontoyaAPI 接口实现

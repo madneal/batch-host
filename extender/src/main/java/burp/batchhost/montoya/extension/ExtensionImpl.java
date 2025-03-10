@@ -1,4 +1,4 @@
-package burp.hae.montoya.extension;
+package burp.batchhost.montoya.extension;
 
 import burp.IBurpExtenderCallbacks;
 import burp.IExtensionStateListener;

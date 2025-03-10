@@ -1,4 +1,4 @@
-package burp.hae.montoya.persistence;
+package burp.batchhost.montoya.persistence;
 
 import burp.IBurpExtenderCallbacks;
 import burp.api.montoya.persistence.PersistedObject;

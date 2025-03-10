@@ -1,4 +1,4 @@
-package burp.hae;
+package burp.batchhost;
 
 import burp.IHttpService;
 import burp.IMessageEditorController;

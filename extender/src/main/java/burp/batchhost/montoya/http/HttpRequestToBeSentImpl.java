@@ -1,4 +1,4 @@
-package burp.hae.montoya.http;
+package burp.batchhost.montoya.http;
 
 import burp.api.montoya.core.*;
 import burp.api.montoya.http.HttpService;

@@ -1,4 +1,4 @@
-package burp.hae.montoya.ui;
+package burp.batchhost.montoya.ui;
 
 import burp.IBurpExtenderCallbacks;
 import burp.IExtensionHelpers;
@@ -8,7 +8,7 @@ import burp.api.montoya.http.HttpService;
 import burp.api.montoya.http.message.requests.HttpRequest;
 import burp.api.montoya.ui.Selection;
 import burp.api.montoya.ui.editor.HttpRequestEditor;
-import burp.hae.MessageEditorController;
+import burp.batchhost.MessageEditorController;
 
 import java.awt.*;
 import java.util.Optional;

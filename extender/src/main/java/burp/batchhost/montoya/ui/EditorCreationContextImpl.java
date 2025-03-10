@@ -1,4 +1,4 @@
-package burp.hae.montoya.ui;
+package burp.batchhost.montoya.ui;
 
 import burp.api.montoya.core.ToolSource;
 import burp.api.montoya.core.ToolType;

@@ -1,4 +1,4 @@
-package burp.hae;
+package burp.batchhost;
 
 import burp.*;
 import burp.api.montoya.BurpExtension;
@@ -11,11 +11,11 @@ import burp.api.montoya.http.handler.RequestToBeSentAction;
 import burp.api.montoya.http.handler.ResponseReceivedAction;
 import burp.api.montoya.http.message.requests.HttpRequest;
 import burp.api.montoya.http.message.responses.HttpResponse;
-import burp.hae.montoya.MontoyaApiImpl;
-import burp.hae.montoya.http.HttpImpl;
-import burp.hae.montoya.http.HttpRequestToBeSentImpl;
-import burp.hae.montoya.http.HttpResponseReceivedImpl;
-import burp.hae.montoya.http.HttpServiceImpl;
+import burp.batchhost.montoya.MontoyaApiImpl;
+import burp.batchhost.montoya.http.HttpImpl;
+import burp.batchhost.montoya.http.HttpRequestToBeSentImpl;
+import burp.batchhost.montoya.http.HttpResponseReceivedImpl;
+import burp.batchhost.montoya.http.HttpServiceImpl;
 import burp.vaycore.common.helper.UIHelper;
 import burp.vaycore.common.log.Logger;
 import burp.vaycore.common.utils.ClassUtils;

@@ -1,11 +1,11 @@
-package burp.hae.montoya.ui;
+package burp.batchhost.montoya.ui;
 
 import burp.IBurpExtenderCallbacks;
 import burp.IMessageEditor;
 import burp.api.montoya.http.message.responses.HttpResponse;
 import burp.api.montoya.ui.Selection;
 import burp.api.montoya.ui.editor.HttpResponseEditor;
-import burp.hae.MessageEditorController;
+import burp.batchhost.MessageEditorController;
 
 import java.awt.*;
 import java.util.Optional;

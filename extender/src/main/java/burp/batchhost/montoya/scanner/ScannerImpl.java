@@ -1,4 +1,4 @@
-package burp.hae.montoya.scanner;
+package burp.batchhost.montoya.scanner;
 
 import burp.IBurpExtenderCallbacks;
 import burp.api.montoya.core.Registration;

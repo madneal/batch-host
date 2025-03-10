@@ -1,6 +1,6 @@
 package burp.vaycore.onescan.ui.tab.config;
 
-import burp.hae.HaE;
+import burp.batchhost.HaE;
 import burp.vaycore.common.helper.UIHelper;
 import burp.vaycore.common.layout.HLayout;
 import burp.vaycore.common.utils.StringUtils;

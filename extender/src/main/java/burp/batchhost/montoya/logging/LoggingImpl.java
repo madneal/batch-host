@@ -1,4 +1,4 @@
-package burp.hae.montoya.logging;
+package burp.batchhost.montoya.logging;
 
 import burp.IBurpExtenderCallbacks;
 import burp.api.montoya.logging.Logging;
