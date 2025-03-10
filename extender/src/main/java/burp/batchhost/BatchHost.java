@@ -244,7 +244,6 @@ public class BatchHost {
         // 调用 Response 事件处理
         ResponseReceivedAction receivedAction = http.httpHandler().handleHttpResponseReceived(received);
         annotations = receivedAction.annotations();
-        // HaE 高亮
         comment = annotations.notes();
         colorName = annotations.highlightColor().displayName().toLowerCase();
         messageInfo.setComment(comment);
